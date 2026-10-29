@@ -1,0 +1,95 @@
+erDiagram
+    books ||--o{ book_contributors : "credits"
+    contributors ||--o{ book_contributors : "is credited on"
+    books ||--|{ copies : "has 1 to 5"
+    copies ||--o{ loans : "is borrowed in"
+    members ||--o{ loans : "borrows"
+    members ||--o{ payment_methods : "pays with"
+    members ||--o{ holds : "places"
+    books ||--o{ holds : "is requested in"
+    copies |o--o{ holds : "is set aside for"
+    loans ||--o{ fees : "can incur"
+    members ||--o{ fees : "owes"
+    payment_methods |o--o{ fees : "pays"
+
+    books {
+        INTEGER book_id PK
+        INTEGER goodreads_book_id UK
+        TEXT isbn
+        TEXT isbn13
+        TEXT title
+        TEXT original_title
+        INTEGER publication_year
+        TEXT language_code
+        NUMERIC msrp
+    }
+    contributors {
+        INTEGER contributor_id PK
+        TEXT name UK
+    }
+    book_contributors {
+        INTEGER book_id PK,FK
+        INTEGER contributor_id PK,FK
+        TEXT role PK "author, illustrator, translator..."
+        INTEGER credit_order
+    }
+    copies {
+        INTEGER copy_id PK
+        INTEGER book_id FK
+        TEXT acquired_date
+        TEXT condition
+        TEXT lost_date
+        TEXT withdrawn_date
+    }
+    members {
+        INTEGER member_id PK
+        TEXT first_name
+        TEXT last_name
+        TEXT birth_date
+        TEXT email UK
+        TEXT phone
+        TEXT street
+        TEXT city
+        TEXT state
+        TEXT zip
+        TEXT joined_date
+    }
+    payment_methods {
+        INTEGER payment_method_id PK
+        INTEGER member_id FK
+        TEXT method_type
+        TEXT brand
+        TEXT last4
+        TEXT processor_token UK
+        INTEGER is_default
+    }
+    loans {
+        INTEGER loan_id PK
+        INTEGER copy_id FK
+        INTEGER member_id FK
+        TEXT checkout_date
+        TEXT loan_type "standard 14d / extended 30d"
+        TEXT due_date "calculated"
+        TEXT returned_date
+        TEXT lost_date
+    }
+    holds {
+        INTEGER hold_id PK
+        INTEGER book_id FK
+        INTEGER member_id FK
+        INTEGER copy_id FK "set when ready"
+        TEXT placed_date
+        TEXT ready_date
+        TEXT expires_date "max 7 days"
+        TEXT status
+    }
+    fees {
+        INTEGER fee_id PK
+        INTEGER member_id FK
+        INTEGER loan_id FK
+        INTEGER payment_method_id FK
+        TEXT fee_type "late or lost"
+        NUMERIC amount
+        TEXT assessed_date
+        TEXT paid_date
+    }
